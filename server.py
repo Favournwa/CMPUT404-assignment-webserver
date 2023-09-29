@@ -37,7 +37,7 @@ class MyWebServer(socketserver.BaseRequestHandler):
         print("Got a request of: %s\n" % self.data)
 
         http_method = self.data.decode('utf-8').split()[0]
-        http_path = "./www" + self.data.decode('utf-8').split()[1]
+        http_path = self.data.decode('utf-8').split()[1]
 
         if http_method != "GET":  # if method is not GET (i.e POST, PUT, DELETE)
             response = "HTTP/1.1 405 Method Not Allowed\r\n\r\n".encode()
@@ -45,15 +45,17 @@ class MyWebServer(socketserver.BaseRequestHandler):
         else:
             try:
                 if http_path.endswith("/"):  # if a directory/html file
-                    http_path = http_path + "index.html"
+                    http_path = "./www" + http_path + "index.html"
                     with open(http_path, 'r') as f:
                         html_file = f.read()
                     response = f"HTTP/1.1 200 OK \r\nContent-Type: text/html\r\n\r\n<body>{html_file}</body>".encode()
                 elif http_path.endswith(".css"):  # if a css file
+                    http_path = "./www" + http_path
                     with open(http_path, 'r') as f:
                         css_file = f.read()
                     response = f"HTTP/1.1 200 OK \r\nContent-Type: text/css\r\n\r\n{css_file}".encode()
                 elif http_path.endswith(".html"):  # if a html file
+                    http_path = "./www" + http_path
                     with open(http_path, 'r') as f:
                         html_file = f.read()
                     response = f"HTTP/1.1 200 OK \r\nContent-Type: text/html\r\n\r\n{html_file}".encode()
@@ -76,5 +78,3 @@ if __name__ == "__main__":
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
     server.serve_forever()
-
-    connection.close()
